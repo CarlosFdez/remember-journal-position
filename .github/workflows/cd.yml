@@ -1,0 +1,45 @@
+name: Module CD
+
+on:
+  workflow_dispatch:
+    branches: [main]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    strategy:
+      matrix:
+        node-version: [20.x]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Update Manifest
+        run: |
+          MODULE_VERSION=$(grep -oP '(?<="version": ")[^"]+' module.json | tr -d '\n')
+          perl -pi -E "s|latest/download/module\\.zip|download/$MODULE_VERSION/module.zip|" module.json
+          echo "moduleVersion=$MODULE_VERSION" >> $GITHUB_ENV
+
+      - name: Zip Files
+        run: zip -r ./module.zip module.json main.mjs
+
+      - name: Create Version Release
+        id: create_version_release
+        uses: ncipollo/release-action@v1
+        with:
+          name: ${{ env.moduleVersion }}
+          allowUpdates: true
+          draft: false
+          prerelease: true
+          token: ${{ secrets.GITHUB_TOKEN }}
+          artifacts: "./module.json,./module.zip"
+          tag: ${{ env.moduleVersion }}

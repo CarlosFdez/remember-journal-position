@@ -1,0 +1,18 @@
+{
+  "id": "remember-journal-position",
+  "title": "Remember Journal Scroll Position",
+  "description": "Restore scroll positions for re-opened journals",
+  "version": "1.0.0",
+  "compatibility": {
+    "minimum": "13",
+    "verified": "13"
+  },
+  "authors": [
+    {
+      "name": "Carlos Fernandez",
+      "discord": "Supe",
+      "flags": {}
+    }
+  ],
+  "esmodules": ["main.mjs"]
+}
